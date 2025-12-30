@@ -1,19 +1,10 @@
 # Warchiving
 ### 추천시스템 기반 예비 부부들을 위한 웨딩 아카이빙 App
 
-불투명한 웨딩 시장의 정보 비대칭을 해소하고, AI 기반 맞춤형 추천으로 소비자 중심의 거래를 돕는 웨딩 아카이빙 플랫폼입니다.
+불투명한 웨딩 시장의 정보 비대칭을 해소하고, AI 기반 맞춤형 추천으로 소비자 중심의 거래를 돕는 웨딩 아카이빙 플랫폼입니다. 
 
 <img src="images/154.png">
 <img src="images/background-warchiving.png">
-
-
-
-## 🌐 Introduction Repo Structure
-- FE Repo: [프론트엔드 레포지토리](https://github.com/Warchiving/Warchiving-front)
-- AI Rec Repo: [AI 추천시스템 레포지토리](https://github.com/Warchiving/Warchiving-AI)
-
-
-
 
 ## 🌐 installation(set up)
 
@@ -24,18 +15,88 @@ pip install -r requirements.txt
 uvicorn main:app --reload # fast api 서버 실행
 ```
 
+## 🌐 Wedding Domain Recommender System
 
-## 🌐 Datasets Info
+### 1. Callenge: 웨딩은 일 생의 단 한번, 추천시스템에서 초기 cold-start 문제에 직면하다. 
+- 웨딩 도메인의 가장 큰 특징은 유저당 **'평생 단 한 번'** 의 구매가 일어난다는 점입니다. 네이버 카페 등에서 방대한 후기를 수집하더라도, 특정 유저가 짧은 기간 안에 웨딩홀을 두 번 예약하는 경우는 사실상 없습니다. **이처럼 유저의 과거 구매 이력이 존재하지 않는 상황에서 발생하는 초기 데이터 부재(Cold-Start) 문제는 저희 프로젝트가 해결해야 할 첫 번째 과제였습니다.** 
+- 이를 해결하기 위해 초기 로직으로 **콘텐츠 기반 필터링(Content-based Filtering)** 을 채택했습니다. 웨딩홀이 가진 고유한 피처(특징)들의 유사도를 분석하여, 유저가 1~3차 필터링을 거치면 본인의 니즈와 가장 닮은 Top-10 웨딩홀을 제안합니다.
+- 추후 앱 배포를 통해 유저들의 클릭, 상세페이지 체류 시간(스크롤), '찜' 같은 행위 기반 시퀀스 데이터가 쌓인다면, 이를 모두 저장하여 CTR(클릭률) 예측 모델로 고도화할 계획입니다.
 
-### Datasets Collection
-Wedding datasets 수집: 웨딩 카페([메이크마이 웨딩](https://makemywedding.co.kr/), [아이웨딩](https://www.iwedding.co.kr/brand?category=%EC%9B%A8%EB%94%A9%ED%99%80&subCategory=1&tag=&keyword=&page=1&utm_source=google_sa&utm_medium=cpc&utm_campaign=%EB%A6%AC%EB%93%9C_%EA%B0%80%EC%9E%85_%EC%95%84%EC%9D%B4%EC%9B%A8%EB%94%A9_PC&utm_content=%EC%9B%A8%EB%94%A9%ED%99%80&utm_term=%EC%98%88%EC%8B%9D%EC%9E%A5&gad_source=1&gad_campaignid=20448275692&gbraid=0AAAAAqBQcJwGG64HX_7kayQAdE8yKlJ88&gclid=CjwKCAiA3rPKBhBZEiwAhPNFQMWixxmoHPHGxd1_Toggis_YquZeiU04lN4-oH7PTZOJeVAn1a7kLRoCgz0QAvD_BwE))위주로 한국에 특화된 웨딩 정보 크롤링을 하였습니다.
-🔹드레스샵: 드레스의 분위기를 레이블링한 [캐글 데이터셋](https://www.kaggle.com/datasets/tnt2001/weddingdress?resource=download)도 추가하여 이미지기반 학습을 정교화 함.
 
-### Data processing
+### 2. Callenge "좋고 나쁨"이 아닌 "취향"의 영역: 이진 분류의 한계를 넘어서
+추천시스템에 자주 사용하는 '긍정 리뷰', '부정 리뷰'는 우리의 웨딩 도메인 추천시스템에 적합하지 았았습니다. 가령,
+_'bridal_room'_(신부대기실) column에서 두 가지의 리뷰가 있다고 하면, 
+
+- sample 1: _'바로 홀로 입장이 가능하여 동선이 짧다.'_
+- sample 2: _'2층에서 신부가 내려오는 것이라 공주 입장 같고 예쁘다.'_
+
+두 개의 리뷰는 사람 성향과 취향에 따라 갈리는 신부 대기실로 긍정/부정 분류문제는 적합하지 않았다.
+
+이는 2차 필터링에서 사용자가 태그를 우선순위를 정할 때 다음과 같은 2가지로 해결할 수 있다.
+
+- solution 1: 태그말고 아예 user_query를 입력 받는다. 입력 받은 user_query와 기존에 임베딩 벡터화 한 웨딩홀 데이터셋을 비교하여 유사도가 가장 높은 홀 10개를 Ranking해준다.
+- solution 2: 태그를 더 상세하게 범주화 시킨다. 이는 유저 입장과 비즈니스 로직을 더 견고하게 고민했어야 했다.
+
+### 3. Solution: 익숙한 UI와 기술적 탐험(Exploration)의 조화
+위의 고민들을 바탕으로 유저에게 가장 친숙하면서도 정확한 추천을 제공하기 위해 다음과 같은 장치들을 마련했습니다.
+   - **사용자 친화적 UI (Tag-based)**: 챗봇처럼 쿼리를 직접 입력하는 방식은 자유도가 높지만 유저에게는 피로감을 줄 수 있습니다. 쿠팡이나 넷플릭스처럼 익숙한 태그 다중 선택 방식을 도입하여 직관적인 UX를 설계했습니다.
+   - **NLP 기반 가중치 랭킹**: 초기 추천은 NLP 모델을 통해 '가장 긍정적인 평가'를 받은 문장들과의 유사도를 측정합니다. 이때 유저가 설정한 우선순위에 강한 가중치를 부여하여 랭킹의 변별력을 높였습니다.
+   - **추천의 다양성과 탐험(Exploration)**: 유저가 자신의 취향을 확신하지 못할 때 새로운 베뉴를 발견할 기회가 필요합니다. 이를 위해 개인화 Top-10 외에, 취향과는 무관한 랜덤 10개 베뉴를 Top-10 아래에 노출하게 하여 유저가 서비스를 '탐험'하고 체류할 수 있게 유도했습니다.
+   - **검색(User Query)의 병행**: 돋보기 기능을 통해 직접 검색도 가능하게 하여, 유저의 체류 시간이 길어지고 데이터가 쌓일수록 더욱 정교한 개인화 추천이 가능하도록 시스템의 확장성을 열어두었습니다.
+
+
+## 🌐 User Flow 설계: 유저의 고민을 줄여주는 '단계별 소거법' 설계
+
+단순히 많은 필터를 제공하는 것이 친절한 서비스는 아닙니다. 네이버 카페 분석과 예비 부부들을 대상으로 한 심층 인터뷰를 통해, 웨딩홀 결정 과정에는 거스를 수 없는 **'3대 결정 요소'** 가 있음을 확인했습니다.
+1. 예산
+2. 예식장 위치
+3. 웨딩홀 분위기
+
+대부분의 유저는 이 순서에 따라 후보군을 좁혀 나갑니다. 저는 이 흐름을 서비스의 메인 플로우로 그대로 이식하여, 유저가 정보의 홍수 속에서 길을 잃지 않도록 설계했습니다.
+
+### 효율적인 후보군 생성(Candidate Generation): 1·2차 필터링
+- **1차 필터링 (현실적 제약 소거)**: 가장 먼저 예산과 위치를 설정하게 하여, 물리적으로 불가능한 옵션들을 선제적으로 제거합니다. 이는 서버 측면에서도 불필요한 연산을 줄여주는 후보군 생성(Candidate Generation) 단계가 됩니다.
+
+- **2차 필터링 (시각적 범주화)**: '분위기'라는 추상적인 개념을 최대한 촘촘하게 **범주화(Categorization)** 했습니다. 유저는 복잡한 고민 대신, UI 상에서 본인이 선호하는 무드(예: 호텔 예식, 야외 웨딩, 채플 스타일 등)를 직관적으로 선택하기만 하면 됩니다.
+
+### 개인화의 완성(Ranking): 취향 기반의 3차 가중치 필터링 
+1, 2차 단계를 통해 '조건'에 맞는 홀들이 남았다면, 마지막 3차 필터링은 **'취향'** 의 영역입니다.
+
+여기서는 식사, 서비스 등 개인별 중요도가 다른 항목에 대해 유저가 직접 우선순위를 설정하도록 설계했습니다.
+
+시스템은 이 우선순위에 따라 가중치를 부여하여 **final_score**를 계산합니다. 특히 유저의 **체감 만족도**를 높이기 위해 최고점(2점)과 최악점(-1점)의 간극을 넓게 설정했습니다. 이러한 점수 차 극대화 전략은 유저가 선택한 핵심 항목에서 우수한 베뉴를 압도적인 점수 차로 상단에 배치함으로써, 시스템이 본인의 취향을 정확히 읽어냈다는 직관적인 신뢰를 제공합니다.
+
+최종 랭킹 산출 수식은 다음과 같습니다.
+
+$$Final Score = (S_{1st} \times 1.5) + (S_{2nd} \times 1.2) + (S_{3rd} \times 1.0) + \sum (S_{etc} \times 0.5)$$
+
+* **$S_{1st}, S_{2nd}, S_{3rd}$**: 유저가 설정한 1·2·3순위 항목의 앙상블 점수
+* **$S_{etc}$**: 우선순위 외 나머지 항목들의 기본 점수 (노이즈 방지를 위해 0.5 가중치 적용)
+* **Score Mapping**: Positive(**2점**) / Neutral(**0점**) / Negative(**-1점**) 설계를 통해 추천 적합도에 따른 변별력을 확보함
+
+
+## 🌐 Datasets
+
+### 데이터 속성 파악 및 수집
+1. Wedding datasets 수집: 현재 '예식홀 후기'가 가장 활발하게 올라오는 두 개의 네이버 카페를 대상(웨딩 카페([메이크마이 웨딩](https://makemywedding.co.kr/), [아이웨딩](https://www.iwedding.co.kr/brand?category=%EC%9B%A8%EB%94%A9%ED%99%80&subCategory=1&tag=&keyword=&page=1&utm_source=google_sa&utm_medium=cpc&utm_campaign=%EB%A6%AC%EB%93%9C_%EA%B0%80%EC%9E%85_%EC%95%84%EC%9D%B4%EC%9B%A8%EB%94%A9_PC&utm_content=%EC%9B%A8%EB%94%A9%ED%99%80&utm_term=%EC%98%88%EC%8B%9D%EC%9E%A5&gad_source=1&gad_campaignid=20448275692&gbraid=0AAAAAqBQcJwGG64HX_7kayQAdE8yKlJ88&gclid=CjwKCAiA3rPKBhBZEiwAhPNFQMWixxmoHPHGxd1_Toggis_YquZeiU04lN4-oH7PTZOJeVAn1a7kLRoCgz0QAvD_BwE)))으로 웨딩홀 리뷰를 크롤링을 하였습니다.
+ 
+### 데이터 전처리(Data processing)
+
 * 업체마다 다른 보증금, 추가비용, 정가를 .csv 파일로 정리하여 데이터 전처리를 진행하였습니다.
 <img src="images/datasets.png">
 
-## 🌐 AI Rec(AI 추천시스템)
+### 데이터 스코어링 설계(유사도 측정을 위한 Scoring)
+
+| 점수 | 상태 | 평가 가이드라인 |
+| :---: | :---: | :--- |
+| **-1점** | 👎 부정 | 서비스나 시설에 대해 직접적으로 불만족을 표현한 경우 |
+| **0점** | 😐 중립 | 별도 언급이 없거나, "무난하다/평범하다"라고 평가한 경우 |
+| **2점** | 👍 긍정 | 시설, 음식, 서비스 등에 대해 만족감을 표현하거나 추천한 경우 |
+
+
+## 🌐 Introduction Repo Structure
+- FE Repo: [프론트엔드 레포지토리](https://github.com/Warchiving/Warchiving-front)
+
 
 
 ## 🌐 Members
