@@ -17,7 +17,7 @@ from typing import List, Dict
 from sentence_transformers import CrossEncoder
 
 class CrossEncoderReranker:
-    def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3"):
+    def __init__(self, model_name: str = "BAAI/bge-reranker-base"):
         """
         query + passage를 함께 읽는 cross-encoder
         """

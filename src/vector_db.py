@@ -60,15 +60,11 @@ class DenseSparseIndex:
         self.df = passage_df # 이 시점부터 doc_id가 시스템의 절대 기준 키
 
         # Dense: ChromaDB
-        self.client = chromadb.Client(
-            Settings(
-                chroma_db_impl="duckdb+parquet",
-                persist_directory=chroma_path,
-                anonymized_telemetry=False,
-            )
-        )
+        self.client = chromadb.PersistentClient(path=chroma_path)
+        
+        # 컬렉션 가져오기 또는 생성
         self.collection = self.client.get_or_create_collection(name=collection_name)
-
+        
         # Sparse: BM25
         docs = self.df["text_chunk"].fillna("").astype(str).tolist()
         self.tokenized_docs: List[List[str]] = [d.split() for d in docs]
@@ -88,9 +84,15 @@ class DenseSparseIndex:
 
         # 이미 데이터가 있다면 초기화할지 말지 결정 (지금은 일단 비움)
         if self.collection.count() > 0:
-            print("⚠️ Existing collection found. Deleting all and rebuilding.")
-            self.collection.delete(where={})
-
+                    print(f"⚠️ 기존 데이터({self.collection.count()}건) 발견. 초기화 후 재구축합니다.")
+                    
+                    # 1. 현재 컬렉션의 이름을 가져옵니다.
+                    target_name = self.collection.name 
+                    
+                    # 2. 컬렉션을 삭제하고 새로 만듭니다.
+                    self.client.delete_collection(name=target_name)
+                    self.collection = self.client.create_collection(name=target_name) 
+        
         ids = self.df["doc_id"].tolist()
         documents = self.df["text_chunk"].tolist()
         metadatas = self.df[
