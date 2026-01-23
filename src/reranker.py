@@ -1,54 +1,25 @@
-"""
-Cross-Encoder 기반 재순위화 로직을 구현할 파일.
-
-- retrieve된 Top-K passage들에 대해
-  (query, text_chunk)를 Cross-Encoder에 넣어 점수 재계산
-  
-  [역할]
-- recall 단계에서 끌고 온 passage 후보들에 대해
-- query + passage를 함께 읽고 의미적 정합성 점수 계산
-
-  [중요]
-  - 여기서 계산된 rerank_score만이
-    "이 문장이 쿼리에 실제로 맞는가?"를 판단하는 점수임
-"""
-
-from typing import List, Dict
 from sentence_transformers import CrossEncoder
+from .config import CROSS_ENCODER_NAME
 
 class CrossEncoderReranker:
-    def __init__(self, model_name: str = "BAAI/bge-reranker-base"):
-        """
-        query + passage를 함께 읽는 cross-encoder
-        """
-        self.model = CrossEncoder(model_name)
+    def __init__(self):
+        print(f"\n[Step 3] Cross-Encoder 로드 중: {CROSS_ENCODER_NAME}")
+        self.model = CrossEncoder(CROSS_ENCODER_NAME)
 
-    def rerank(
-        self,
-        query: str,
-        passages: List[Dict],
-        top_k: int = 50,
-    ) -> List[Dict]:
+    def rerank(self, query, candidates):
         """
-        passages: hybrid_search 결과 (rrf 기반 recall 결과)
-        passages: [
-          {
-            "text_chunk": str,
-            "aspect": str,
-            "venue_id": int,
-            ...
-          }
-        ]
+        Input: 유저 쿼리, RRF 후보 리스트
+        Process: 쿼리와 후보 문장을 Pair로 묶어 정밀 채점
+        Output: cross_score가 추가된 후보 리스트
         """
-        pairs = [(query, p["text_chunk"]) for p in passages]
+        if not candidates: return []
+        print(f"  - 총 {len(candidates)}개 후보 문장 정밀 재순위화 시작...")
+        
+        # Cross-Encoder 전용 입력 포맷: [[질문, 문장1], [질문, 문장2], ...]
+        pairs = [[query, c['text']] for c in candidates]
         scores = self.model.predict(pairs)
-
-        for p, s in zip(passages, scores):
-            p["rerank_score"] = float(s)
-
-        passages = sorted(
-            passages,
-            key=lambda x: x["rerank_score"],
-            reverse=True,
-        )
-        return passages[:top_k]
+        
+        for i, score in enumerate(scores):
+            candidates[i]['cross_score'] = float(score)
+            
+        return sorted(candidates, key=lambda x: x['cross_score'], reverse=True)

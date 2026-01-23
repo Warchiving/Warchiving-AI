@@ -22,8 +22,8 @@ ASPECT_COLUMNS = [
 
 # Hard flitering col: "in_guarantee" ("catering", "pricing_detail")
 
-VENUE_ID_COL = "hall_id"
-HALL_NAME_COL = "name"
+VENUE_ID_COL = "venue_id" #hall_id
+HALL_NAME_COL = "hall_name" #name
 
 RAW_CSV_PATH = "./data/raw/20260107_final_wedding_augmented.csv"
 PROCESSED_PARQUET_PATH = "./data/processed/processed.parquet"
