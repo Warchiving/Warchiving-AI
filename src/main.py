@@ -239,8 +239,8 @@ if __name__ == "__main__":
     user_query = "야외 웨딩홀에 식대가 맛있는 곳"
     ground_truth = EVAL_GROUND_TRUTH.get(user_query, [])
     
-    print(f"\n🔍 테스트 쿼리: {user_query}")
-    print(f"✅ 정답 업체 리스트: {ground_truth}")
+    print(f"\n테스트 쿼리: {user_query}")
+    print(f"정답 업체 리스트: {ground_truth}")
     
     # 2) 서비스 클래스 초기화
     embedder = BGEEmbedder()
@@ -256,21 +256,21 @@ if __name__ == "__main__":
     start_ret = time.time()
     candidates = hybrid_retrieval(user_query, relevant_aspects, index_service, embedder, df_processed)
     ret_latency = time.time() - start_ret
-    print(f"⏱️ 검색 시간: {ret_latency:.2f}초")
-    print(f"✅ 검색된 총 후보 수: {len(candidates)}개")
+    print(f"⏱검색 시간: {ret_latency:.2f}초")
+    print(f"검색된 총 후보 수: {len(candidates)}개")
     
     # 중간 테스트 평가: 리트리버의 Recall
     print("\n" + "="*40)
-    print("📊 [Step 1] Retrieval(예선) 성능 평가")
+    print("[Step 1] Retrieval(예선) 성능 평가")
     print("="*40)
     evaluate_retrieval(candidates, ground_truth)
-    print(f"⏱️ Retrieval 소요 시간: {ret_latency:.4f}s")
+    print(f"Retrieval 소요 시간: {ret_latency:.4f}s")
     
     # 4) Reranking
     start_rerank = time.time()
     reranked_res = reranking(user_query, candidates, reranker)
     rerank_latency = time.time() - start_rerank
-    print(f"⏱️ 재정렬 시간: {rerank_latency:.2f}초")
+    print(f"재정렬 시간: {rerank_latency:.2f}초")
 
     # 5) Aggregation
     start_agg = time.time()
@@ -287,16 +287,16 @@ if __name__ == "__main__":
 
     # 6) 최종 통합 리포트 출력
     print("\n" + "="*50)
-    print("🏆 시스템 최종 성능 검증 리포트")
+    print("<시스템 최종 성능 검증 리포트>")
     print("="*50)
     
-    print(f"📊 [품질 지표 - 정밀도 및 순위]")
+    print(f"[품질 지표 - 정밀도 및 순위]")
     print(f"   - Recall@Ret      : {recall_ret:.4f} (후보군 내 정답 비율)")
     print(f"   - MRR             : {metrics['mrr']:.4f}")
     print(f"   - Hit Rate@10     : {metrics['hit_rate']:.0f}")
     print(f"   - nDCG@10         : {metrics['ndcg']:.4f}")
     
-    print(f"\n⏱️ [효율 지표 - 지연 시간]")
+    print(f"\n[효율 지표 - 지연 시간]")
     print(f"   - Retrieval       : {ret_latency:.4f}s")
     print(f"   - Reranking       : {rerank_latency:.4f}s")
     print(f"   - Aggregation     : {agg_latency:.4f}s")

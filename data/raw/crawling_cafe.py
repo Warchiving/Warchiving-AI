@@ -10,8 +10,8 @@ import re
 
 # --- 설정 구간 ---
 url = 'https://nid.naver.com/nidlogin.login'
-id = 'yiurim'
-pw = '9406shin!'
+id = 'id'
+pw = 'password'
 baseurl = 'https://cafe.naver.com/makemywedding'
 clubid = '28757979'
 menuid = '14'
