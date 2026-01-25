@@ -114,32 +114,4 @@ uvicorn main:app --reload # fast api 서버 실행
 
 
 
-## 🌐 Datasets
-
-### 데이터 속성 파악 및 수집
-1. Wedding datasets 수집: 현재 '예식홀 후기'가 가장 활발하게 올라오는 두 개의 네이버 카페를 대상(웨딩 카페([메이크마이 웨딩](https://makemywedding.co.kr/), [아이웨딩](https://www.iwedding.co.kr/brand?category=%EC%9B%A8%EB%94%A9%ED%99%80&subCategory=1&tag=&keyword=&page=1&utm_source=google_sa&utm_medium=cpc&utm_campaign=%EB%A6%AC%EB%93%9C_%EA%B0%80%EC%9E%85_%EC%95%84%EC%9D%B4%EC%9B%A8%EB%94%A9_PC&utm_content=%EC%9B%A8%EB%94%A9%ED%99%80&utm_term=%EC%98%88%EC%8B%9D%EC%9E%A5&gad_source=1&gad_campaignid=20448275692&gbraid=0AAAAAqBQcJwGG64HX_7kayQAdE8yKlJ88&gclid=CjwKCAiA3rPKBhBZEiwAhPNFQMWixxmoHPHGxd1_Toggis_YquZeiU04lN4-oH7PTZOJeVAn1a7kLRoCgz0QAvD_BwE)))으로 웨딩홀 리뷰를 크롤링을 하였습니다.
- 
-### 데이터 전처리(Data processing)
-
-* 업체마다 다른 보증금, 추가비용, 정가를 .csv 파일로 정리하여 데이터 전처리를 진행하였습니다.
-<img src="images/datasets.png">
-
-### 데이터 스코어링 설계(유사도 측정을 위한 Scoring)
-
-| 점수 | 상태 | 평가 가이드라인 |
-| :---: | :---: | :--- |
-| **-1점** | 👎 부정 | 서비스나 시설에 대해 직접적으로 불만족을 표현한 경우 |
-| **0점** | 😐 중립 | 별도 언급이 없거나, "무난하다/평범하다"라고 평가한 경우 |
-| **2점** | 👍 긍정 | 시설, 음식, 서비스 등에 대해 만족감을 표현하거나 추천한 경우 |
-
-
-## 🌐 Introduction Repo Structure
-- FE Repo: [프론트엔드 레포지토리](https://github.com/Warchiving/Warchiving-front)
-
-
-
-## 🌐 Members
-
-
-
 
