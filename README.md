@@ -29,7 +29,7 @@ uvicorn main:app --reload # fast api 서버 실행
 ---
 
 ## 🌐 Data Strategy: 수집 및 카테고리 분류
-<img src="images/github-1.png">
+<img src="images/github_1.png">
 * **데이터 확보**: 서울/부산권 280개 업체, 총 1,300여 개의 실유저 리뷰(네이버 카페 등 커뮤니티) 크롤링 및 구조화
 * **9개 카테고리 정의**: 리뷰 데이터 내 소비자 언어를 분석하여 가장 빈번하게 언급되는 6개 핵심 속성(Aspect) 정의
     * *분류 항목: 식사, 대중교통, 홀 분위기,하객동선, 주차공간, 신부대기실*
