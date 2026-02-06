@@ -40,7 +40,7 @@ uvicorn main:app --reload # fast api 서버 실행
 ## 🌐 Recommendation Engine Architecture
 
 본 시스템은 대량의 데이터에서 후보군을 확보하고, 문맥을 분석하여 정밀하게 정렬하는 **2-Stage** 구조를 가집니다.
-<img src="images/github-2.png">
+<img src="images/github_2.png">
 * **1단계: Hybrid Retrieval (Candidate Generation)**
     * **BM25 (Sparse)**: '채플홀', '분리예식' 등 도메인 고유 명사를 정확하게 캐칭
     * **BGE-M3 (Dense)**: "분위기가 고급스럽다"와 같은 문장의 의미적 유사성 파악
