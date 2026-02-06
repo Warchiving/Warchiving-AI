@@ -24,12 +24,12 @@ uvicorn main:app --reload # fast api 서버 실행
 웨딩 도메인의 가장 큰 특징은 유저당 **평생 단 한 번**의 구매가 일어난다는 점입니다. 
 - **문제**: 유저의 과거 구매 이력이 전무한 상황에서 발생하는 **Cold-Start** 문제
 - **해결**: 특정 유저의 과거 로그에 의존하는 대신, 유저가 현재 입력하는 **실시간 요구사항**을 정밀하게 분석하여 즉각적인 추천을 제공하는 '하이브리드 추천 시스템'을 설계했습니다.
-<img src="images/background-background.png">
+<img src="images/github-background.png">
 
 ---
 
 ## 🌐 Data Strategy: 수집 및 카테고리 분류
-<img src="images/background-1.png">
+<img src="images/github-1.png">
 * **데이터 확보**: 서울/부산권 280개 업체, 총 1,300여 개의 실유저 리뷰(네이버 카페 등 커뮤니티) 크롤링 및 구조화
 * **9개 카테고리 정의**: 리뷰 데이터 내 소비자 언어를 분석하여 가장 빈번하게 언급되는 6개 핵심 속성(Aspect) 정의
     * *분류 항목: 식사, 대중교통, 홀 분위기,하객동선, 주차공간, 신부대기실*
@@ -40,7 +40,7 @@ uvicorn main:app --reload # fast api 서버 실행
 ## 🌐 Recommendation Engine Architecture
 
 본 시스템은 대량의 데이터에서 후보군을 확보하고, 문맥을 분석하여 정밀하게 정렬하는 **2-Stage** 구조를 가집니다.
-<img src="images/background-2.png">
+<img src="images/github-2.png">
 * **1단계: Hybrid Retrieval (Candidate Generation)**
     * **BM25 (Sparse)**: '채플홀', '분리예식' 등 도메인 고유 명사를 정확하게 캐칭
     * **BGE-M3 (Dense)**: "분위기가 고급스럽다"와 같은 문장의 의미적 유사성 파악
